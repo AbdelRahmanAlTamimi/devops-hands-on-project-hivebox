@@ -32,7 +32,7 @@ jobs:
       # Lint Python code
       - name: Lint with flake8
         run: |
-          flake8 .  --extend-ignore=E203
+          flake8 .
 
       # Lint Dockerfile with hadolint
       - name: Lint Dockerfile
