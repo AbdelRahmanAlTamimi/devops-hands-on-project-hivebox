@@ -1,8 +1,11 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
-# Copy the current directory contents into the container at /app
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /main
 COPY main.py main.py
 
-# Run app.py when the container launches
+# Run main.py when the container launches
 CMD ["python", "main.py"]
