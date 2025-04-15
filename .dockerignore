@@ -1,0 +1,38 @@
+# Git files
+.git
+.gitignore
+
+# Python virtual environment
+.venv
+venv/
+*/venv/
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE/Editor directories
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Secrets or config files you don't want in the image
+*.env
+secrets/
+config.local.yaml
+
+# Build artifacts / Distribution files
+dist/
+build/
+*.egg-info/
+
+# Test files (if not needed in final image)
+tests/
+*.test.py
+pytest.ini
+.pytest_cache/
