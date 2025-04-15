@@ -46,13 +46,13 @@ jobs:
                 # Run Docker container
       - name: Run Docker container
         run: |
-          docker run -d -p 8080:8080 --name my-app my-app:latest
+          docker run -d -p 8000:8000 --name my-app my-app:latest
 
       # Test /version endpoint
       - name: Test /version endpoint
         run: |
           sleep 5 
-          response=$(curl --silent http://localhost:8080/version)
+          response=$(curl --silent http://localhost:8000/version)
           expected_version="1.0.0"  
           if [ "$response" != "$expected_version" ]; then
             echo "Version mismatch: got $response, expected $expected_version"
