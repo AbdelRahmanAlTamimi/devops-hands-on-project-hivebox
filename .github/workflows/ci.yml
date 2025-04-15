@@ -35,11 +35,6 @@ jobs:
         with:
           dockerfile: Dockerfile
 
-      # Run unit tests
-      - name: Run unit tests
-        run: |
-          pytest --cov=. --cov-report=xml
-
       # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

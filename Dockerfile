@@ -19,7 +19,7 @@ RUN addgroup --system --gid 1001 appgroup && \
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir --requirement requirements.txt
 
 # Copy the current directory contents into the container
 # Use --chown to set permissions directly (requires BuildKit and newer Docker)
