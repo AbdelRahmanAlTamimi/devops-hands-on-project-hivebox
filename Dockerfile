@@ -18,16 +18,16 @@ RUN addgroup --system --gid 1001 appgroup && \
 # Install dependencies
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
+# hadolint ignore=DL3013
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir --requirement requirements.txt
 
+
 # Copy the current directory contents into the container
 # Use --chown to set permissions directly (requires BuildKit and newer Docker)
-COPY --chown=appuser:appgroup main.py .
+COPY main.py .
+RUN chown appuser:appgroup main.py
 
-# If --chown is not available or you prefer, uncomment the COPY and RUN chown below:
-# COPY main.py .
-# RUN chown appuser:appgroup main.py
 
 # Expose port 8000 for the app
 EXPOSE 8000
