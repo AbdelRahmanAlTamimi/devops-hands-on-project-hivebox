@@ -1,0 +1,7 @@
+version: "3"
+tasks:
+  default:
+    desc: lint the project
+    cmds:
+      - hadolint Dockerfile
+      - ruff check main.py

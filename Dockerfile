@@ -30,10 +30,10 @@ RUN chown appuser:appgroup main.py
 
 
 # Expose port 8000 for the app
-EXPOSE 8000
+EXPOSE 8080
 
 # Switch to the non-root user
 USER appuser
 
 # Run the app with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "main:app"]

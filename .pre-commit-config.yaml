@@ -1,0 +1,10 @@
+repos:
+  - repo: local
+    hooks:
+      - id: task-default
+        name: Run Task Default
+        entry: task default
+        language: system
+        pass_filenames: false
+        files: (Dockerfile|main\.py)$
+        types: [file]

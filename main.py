@@ -1,80 +1,38 @@
 from flask import Flask, jsonify
-from datetime import datetime, timedelta
 import requests
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-# openSenseMap API base URL
-OSM_API_URL = "https://api.opensensemap.org"
 
-# Specific senseBox ID
-BOX_ID = "5eba5fbad46fb8001b799786"
-
-
-@app.route("/")
-def home():
-    return jsonify({"message": "Welcome to HiveBox API"})
-
-
-@app.route("/version", methods=["GET"])
+@app.route("/version")
 def version():
-    """
-    Returns the version of the deployed app.
-    Endpoint: /version
-    Parameters: None
-    """
     return jsonify({"version": "1.0.0"})
 
 
-@app.route("/temperature", methods=["GET"])
+@app.route("/temperature")
 def temperature():
-    """
-    Returns the current temperature from senseBox ID 5eba5fbad46fb8001b799786.
-    Data must be no older than 1 hour.
-    Endpoint: /temperature
-    Parameters: None
-    """
     try:
-        # Calculate the time threshold (1 hour ago)
+        box_id = "5eba5fbad46fb8001b799786"
         one_hour_ago = datetime.utcnow() - timedelta(hours=1)
 
-        # Fetch specific senseBox from openSenseMap
-        response = requests.get(f"{OSM_API_URL}/boxes/{BOX_ID}")
-        response.raise_for_status()  # Raise exception for bad status codes
+        response = requests.get(f"https://api.opensensemap.org/boxes/{box_id}")
         box = response.json()
 
-        # Get sensors for the box
-        sensors = box.get("sensors", [])
-        for sensor in sensors:
-            # Check if sensor measures temperature
-            if sensor.get("title").lower() == "temperature" and sensor.get(
-                "lastMeasurement"
-            ):
-                last_measurement = sensor["lastMeasurement"]
-                measurement_time = datetime.strptime(
-                    last_measurement["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"
+        for sensor in box["sensors"]:
+            if sensor["title"] == "Temperatur" and "lastMeasurement" in sensor:
+                measure_time = datetime.fromisoformat(
+                    sensor["lastMeasurement"]["createdAt"].replace("Z", "+00:00")
                 )
-                # Ensure measurement is within the last hour
-                if measurement_time >= one_hour_ago:
-                    try:
-                        value = float(last_measurement["value"])
-                        return jsonify({"temperature": round(value, 2)})
-                    except (ValueError, TypeError):
-                        continue  # Skip invalid values
+                if measure_time > one_hour_ago:
+                    return jsonify(
+                        {"temperature": float(sensor["lastMeasurement"]["value"])}
+                    )
 
-        return jsonify(
-            {
-                "error": "No valid temperature data found within the last hour for this senseBox"
-            }
-        ), 404
-
-    except requests.RequestException as e:
-        return jsonify(
-            {"error": f"Failed to fetch data from openSenseMap: {str(e)}"}
-        ), 500
+        return jsonify({"error": "No recent temperature data"}), 404
     except Exception as e:
-        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(host="0.0.0.0", port=8080, debug=True)
