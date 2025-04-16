@@ -15,19 +15,31 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 appgroup && \
     adduser --system --uid 1001 --ingroup appgroup --shell /sbin/nologin --no-create-home appuser
 
-# Install dependencies
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt .
-# hadolint ignore=DL3013
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --requirement requirements.txt
+# Install Poetry
+ENV POETRY_VERSION=2.1.2
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VENV=/opt/poetry-venv
+ENV POETRY_CACHE_DIR=/opt/.cache
 
+# Install Poetry separated from system interpreter
+RUN python3 -m venv $POETRY_VENV \
+    && $POETRY_VENV/bin/pip install -U pip setuptools \
+    && $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
+
+# Add Poetry to PATH
+ENV PATH="${PATH}:${POETRY_VENV}/bin"
+
+# Copy poetry files
+COPY pyproject.toml poetry.lock* ./
+
+# Install dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --no-root
 
 # Copy the current directory contents into the container
 # Use --chown to set permissions directly (requires BuildKit and newer Docker)
 COPY main.py .
 RUN chown appuser:appgroup main.py
-
 
 # Expose port 8000 for the app
 EXPOSE 8080
